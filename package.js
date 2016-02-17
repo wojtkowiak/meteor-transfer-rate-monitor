@@ -13,18 +13,33 @@ Package.describe({
 Package.onUse(function(api) {
     api.versionsFrom('1.2.1');
     api.use('ecmascript@0.1.6');
-    api.use(['ddp-common@1.2.2'], 'client');
+    api.use(['ddp-common@1.2.2'], ['client', 'server']);
     api.use('tracker');
     api.use([
         'templating',
         'handlebars'
     ], 'client');
     api.use('omega:direct-stream-access', ['client', 'server'], { weak: true });
+
     api.addFiles([
-        'src/transferRate.html',
-        'src/transfer-rate.js',
+        'src/lib/TransferRateMonitor.js'
+    ], ['client', 'server']);
+
+
+    api.addFiles([
+        'src/lib/monitorWidget.html',
+        'src/lib/MonitorWidget.js',
+        'src/TransferRateMonitor.client.js',
+        'src/templates/transferRateForClient.html',
+        'src/templates/transferRateForClient.js'
     ], 'client');
 
+    api.addFiles([
+
+
+        'src/TransferRateMonitor.server.js'
+
+    ], 'server');
 
     api.export('transferRateMonitor');
 });

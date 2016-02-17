@@ -1,6 +1,8 @@
 {
   "extends": "airbnb",
-  "globals": { "DDPCommon": true, "DirectStreamAccessCommon": true },
+  "globals": {
+    "TransferRateMonitorCommon": true
+  },
   "rules": {
     "indent": [ 2, 4, { "SwitchCase": 1 } ],
     "comma-dangle": [ 0 ]

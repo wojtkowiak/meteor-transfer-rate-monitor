@@ -7,7 +7,7 @@
     "mocha": true
   },
   "globals": {
-    "DirectStreamAccess": true
+    "transferRateMonitor": true
   },
   "rules": {
     "indent": [ 2, 4 ],
