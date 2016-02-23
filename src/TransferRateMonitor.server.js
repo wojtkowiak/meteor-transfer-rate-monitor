@@ -8,6 +8,8 @@ class TransferRateMonitor extends TransferRateMonitorCommon {
             allowedUsers: null,
             password: 'giveMeStats'
         };
+        this.protocol = new JsonProtocol();
+
     }
 
     configure(options) {
@@ -21,11 +23,19 @@ class TransferRateMonitor extends TransferRateMonitorCommon {
 
     calculateCurrentTransferRate() {
         this.calculateCurrentTransferRateCore();
-        this.callbacks.forEach((callback) => callback());
+        _.each(this.callbacks, id => this.protocol.send('data', this.currentTransferRate, id));
     }
 
-    setCallback(callback) {
-        this.callbacks.push(callback);
+    register(id) {
+        if (this.callbacks.length < this.options.maxSubscriptions) {
+            this.callbacks.push(id);
+        } else {
+            throw new Error('Too many subscriptions.');
+        }
+    }
+
+    unregister(id) {
+        this.callbacks.splice(this.callbacks.indexOf(id), 1);
     }
 
     replaceDirectStreamAccessSend() {
@@ -35,19 +45,35 @@ class TransferRateMonitor extends TransferRateMonitorCommon {
             originalSend.call(Meteor.directStream, message, sessionId);
         }
     }
+
+    isAuthorized(password, userId) {
+        if (!this.options.password === password) return false;
+        if (this.options.allowedUsers === null) return true;
+        return ~this.options.allowedUsers.indexOf(userId);
+    }
 }
 
 transferRateMonitor = new TransferRateMonitor();
 
 // TODO: implement authorization
-Meteor.publish('transferServer', function() {
+Meteor.publish('transferServer', function(password) {
     let self = this;
-    function send() {
-        Meteor.directStream.send('transfer', self.connection.id);
+
+    if (!transferRateMonitor.isAuthorized(password, this.userId)) {
+        console.log('unathorized');
+        this.stop();
+        return;
     }
 
     this.onStop(() => {
-        //transferRateMonitor.setCallback(send);
+        transferRateMonitor.unregister(self.connection.id);
+        console.log('stop for ' + self.connection.id);
     });
-    transferRateMonitor.setCallback(send);
+
+    try {
+        transferRateMonitor.register(self.connection.id);
+        console.log('registered');
+    } catch (exception) {
+        this.stop();
+    }
 });

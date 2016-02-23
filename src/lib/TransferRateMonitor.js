@@ -39,7 +39,6 @@ TransferRateMonitorCommon = class TransferRateMonitorCommon {
     }
 
 
-
     calculateCurrentTransferRateCore() {
         const now = Date.now();
         const timeSpan = now - this.lastTimestamp;
@@ -58,9 +57,4 @@ TransferRateMonitorCommon = class TransferRateMonitorCommon {
 
 
     }
-
 }
-
-
-
-

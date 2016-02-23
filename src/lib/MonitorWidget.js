@@ -32,11 +32,13 @@ class MonitorWidget {
         this.graphElements[dataSet][id].style.height = Math.round(value / max * 30) + 'px';
     }
 
-    updateValues() {
+
+    updateValues(...args) {
         if (this.dataSets.length === 0) return;
         let dataSet = 0;
 
-        for (const value of arguments) {
+        // arguments[@@iterator] is not available in FF<46
+        for (const value of args) {
             if (value !== undefined && value !== null) {
                 this.dataSets[dataSet].unshift(value);
                 if (this.dataSets[dataSet].length > this.elementsCount) {
@@ -53,9 +55,10 @@ class MonitorWidget {
 Template.monitorWidget.helpers({
     // This helper is invoked to pass the reactively changed values to the MonitorWidget instance.
     updateGraph: () => {
+        const monitorWidget = templateInstanceToClassInstanceMap.get(Template.instance());
         const template = Template.instance();
         const data = template.data;
-        const monitorWidget = templateInstanceToClassInstanceMap.get(template);
+
         if (monitorWidget) {
             monitorWidget.updateValues(data.firstDataSource, data.secondDataSource);
         }
@@ -78,7 +81,7 @@ Template.monitorWidget.onRendered(function monitorWidgetRendered() {
         let element;
         for (let i = 0; i < monitorWidget.elementsCount; i++) {
             element = document.createElement('div');
-            element.style = `opacity:0.8;right:${right}px;${position}height:0px;width:${elementsWidth}px;background-color:${color};position:absolute;`;
+            element.style.cssText = `opacity:0.8;right:${right}px;${position}height:0px;width:${elementsWidth}px;background-color:${color};position:absolute;`;
             graphElement.append(element);
             right += elementsWidth;
             monitorWidget.graphElements[id].push(element);

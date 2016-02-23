@@ -3,6 +3,21 @@ class TransferRateMonitor extends TransferRateMonitorCommon {
     constructor() {
         super();
         this.currentTransferRateDependency = new Tracker.Dependency;
+        this.currentServerTransferRateDependency = new Tracker.Dependency;
+        this.currentServerTransferRate = {};
+        this.protocol = new JsonProtocol();
+        this.protocol.on('data', this.saveServerTransferRate.bind(this));
+    }
+
+    saveServerTransferRate(stats) {
+        console.log(stats);
+        this.currentServerTransferRate = stats;
+        this.currentServerTransferRateDependency.changed();
+    }
+
+    getServerTransferRate() {
+        this.currentServerTransferRateDependency.depend();
+        return this.currentServerTransferRate;
     }
 
     getTransferRate() {
@@ -16,7 +31,7 @@ class TransferRateMonitor extends TransferRateMonitorCommon {
     }
 
     subscribe() {
-        Meteor.subscribe('transferServer');
+        Meteor.subscribe('transferServer', 'giveMeStats');
     }
 
     replaceDirectStreamAccessSend() {

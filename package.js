@@ -20,6 +20,7 @@ Package.onUse(function(api) {
         'handlebars'
     ], 'client');
     api.use('omega:direct-stream-access', ['client', 'server'], { weak: true });
+    api.use('omega:custom-protocol', ['client', 'server']);
 
     api.addFiles([
         'src/lib/TransferRateMonitor.js'
