@@ -35,7 +35,9 @@ class TransferRateMonitor extends TransferRateMonitorCommon {
     }
 
     unregister(id) {
-        this.callbacks.splice(this.callbacks.indexOf(id), 1);
+        if (~this.callbacks.indexOf(id)) {
+            this.callbacks.splice(this.callbacks.indexOf(id), 1);
+        }
     }
 
     replaceDirectStreamAccessSend() {
@@ -55,7 +57,6 @@ class TransferRateMonitor extends TransferRateMonitorCommon {
 
 transferRateMonitor = new TransferRateMonitor();
 
-// TODO: implement authorization
 Meteor.publish('transferServer', function(password) {
     let self = this;
 
@@ -67,12 +68,12 @@ Meteor.publish('transferServer', function(password) {
 
     this.onStop(() => {
         transferRateMonitor.unregister(self.connection.id);
-        console.log('stop for ' + self.connection.id);
+        console.log('stop for ' + self.connection.id + ' count: ' + transferRateMonitor.callbacks.length);
     });
 
     try {
         transferRateMonitor.register(self.connection.id);
-        console.log('registered');
+        console.log('registered ' + self.connection.id + ' count: ' + transferRateMonitor.callbacks.length);
     } catch (exception) {
         this.stop();
     }

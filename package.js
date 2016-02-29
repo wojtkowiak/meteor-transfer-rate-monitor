@@ -31,8 +31,8 @@ Package.onUse(function(api) {
         'src/lib/monitorWidget.html',
         'src/lib/MonitorWidget.js',
         'src/TransferRateMonitor.client.js',
-        'src/templates/transferRateForClient.html',
-        'src/templates/transferRateForClient.js'
+        'src/templates/transferRate.html',
+        'src/templates/transferRate.js'
     ], 'client');
 
     api.addFiles([

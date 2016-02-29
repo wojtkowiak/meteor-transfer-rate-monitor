@@ -30,8 +30,8 @@ class TransferRateMonitor extends TransferRateMonitorCommon {
         this.currentTransferRateDependency.changed();
     }
 
-    subscribe() {
-        Meteor.subscribe('transferServer', 'giveMeStats');
+    subscribeForServerTransferRate(password) {
+        Meteor.subscribe('transferServer', password);
     }
 
     replaceDirectStreamAccessSend() {
