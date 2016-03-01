@@ -1,0 +1,15 @@
+<template name="transferRate">
+    {{#if eq for "server"}}
+        {{>monitorWidget firstChartName='Down' widgetName='Server' secondChartName='Up' minScale=1 firstDataSource=(kbs serverTransferIn) secondDataSource=(kbs serverTransferOut)}}
+    {{else}}
+        {{>monitorWidget firstChartName='Down' widgetName='Client' secondChartName='Up' minScale=1 firstDataSource=(kbs clientTransferIn) secondDataSource=(kbs clientTransferOut)}}
+    {{/if}}
+</template>
+
+<template name="clientTransferRateMonitor">
+    {{>transferRate for="client"}}
+</template>
+<template name="serverTransferRateMonitor">
+    {{>transferRate for="server"}}
+</template>
+
