@@ -1,6 +1,7 @@
 ## Meteor Transfer Rate Monitor
 
 Simple transfer rate statistics for Meteor with a nice monitor widget. 
+
 Measures the amount of data sent per second on the client and server.
 
 #### Why would I need this?
@@ -14,6 +15,7 @@ Of course you can also gather the data and use for all kind of statistical purpo
 #### Why it is not debugOnly?
 
 Because I am using it in production :smile:
+
 The widget is used as monitoring tool and the data is used to generate warnings about unusual transfer rates. 
 Also on the client I have used it to implement a safety check which disconnects the app when abnormal traffic is detected. 
 When somebody tries to attack your server by modifying your client, this can give you extra time to be prepared.   
@@ -45,12 +47,21 @@ Both are returning an object:
 ```
 
 However on the client to get the server stats you need to be subscribed first.
-To subscribe call `transferRateMonitor.subscribeForServerTransferRate(myPassword);` in `Meteor.startup` or anywhere you want. 
+To subscribe call 
+```javascript
+transferRateMonitor.subscribeForServerTransferRate(myPassword);
+```
+in `Meteor.startup` or anywhere you want. 
+
 Similary to unsubscribe just invoke `transferRateMonitor.unsubscribeForServerTransferRate();`
 
 The default password is `giveMeStats` and of course can be changed on the server.
 
-To do that run `transferRateMonitor.configure(options);` in your `Meteor.startup` on the server.
+To do that run 
+```javascript
+transferRateMonitor.configure(options);
+```
+in your `Meteor.startup` on the server.
 
 The default options object looks like this:
 ```javascript
