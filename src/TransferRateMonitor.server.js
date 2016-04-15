@@ -1,79 +1,119 @@
+/**
+ * API for the server.
+ *
+ * @type {TransferRateMonitor}
+ */
 class TransferRateMonitor extends TransferRateMonitorCommon {
 
     constructor() {
         super();
-        this.callbacks = [];
-        this.options = {
-            maxSubscriptions: 1,
+        this._callbacks = [];
+        this._options = {
+            maxSubscriptions: 10,
             allowedUsers: null,
             password: 'giveMeStats'
         };
-        this.protocol = new JsonProtocol();
-
+        this._protocol = new TransferRateProtocol();
     }
 
+    /**
+     * Sets new options.
+     * @param {Object} options - Object with options.
+     */
     configure(options) {
         // TODO: validation
-        _.extend(this.options, options);
+        _.extend(this._options, options);
     }
 
+    /**
+     * Getter for server transfer rate.
+     * @returns {{rateIn: *, rateOut: *, messagesIn: *, messagesOut: *}|*}
+     */
     getTransferRate() {
-        return this.currentTransferRate;
+        return this._currentTransferRate;
     }
 
-    calculateCurrentTransferRate() {
-        this.calculateCurrentTransferRateCore();
-        _.each(this.callbacks, id => this.protocol.send('data', this.currentTransferRate, id));
+    /**
+     * Calculates the rates per second and send the stats to all subscribed clients.
+     *
+     * @private
+     */
+    _calculateCurrentTransferRate() {
+        this._calculateCurrentTransferRateCore();
+        this._protocol.send(
+            this._protocol.SERVER_TRANSFER_RATE_MESSAGE,
+            Object.keys(this._currentTransferRate).map(key => this._currentTransferRate[key]),
+            this._callbacks,
+            true
+        );
     }
 
-    register(id) {
-        if (this.callbacks.length < this.options.maxSubscriptions) {
-            this.callbacks.push(id);
+    /**
+     * Subscribes client for receiving serve stats.
+     *
+     * @param {string} id - Meteor session id.
+     */
+    registerConnection(id) {
+        if (this._callbacks.length < this._options.maxSubscriptions) {
+            this._callbacks.push(id);
         } else {
             throw new Error('Too many subscriptions.');
         }
     }
 
-    unregister(id) {
-        if (~this.callbacks.indexOf(id)) {
-            this.callbacks.splice(this.callbacks.indexOf(id), 1);
+    /**
+     * Unsubscribes client.
+     * @param {string} id - Meteor session id.
+     */
+    unregisterConnection(id) {
+        if (~this._callbacks.indexOf(id)) {
+            this._callbacks.splice(this._callbacks.indexOf(id), 1);
         }
     }
 
-    replaceDirectStreamAccessSend() {
+    /**
+     * Wraps direct stream's send method.
+     * @private
+     */
+    _replaceDirectStreamAccessSend() {
         const originalSend = Meteor.directStream.send;
         Meteor.directStream.send = (message, sessionId) => {
             this.bytesOut += message.length;
             originalSend.call(Meteor.directStream, message, sessionId);
-        }
+        };
     }
 
-    isAuthorized(password, userId) {
-        if (!this.options.password === password) return false;
-        if (this.options.allowedUsers === null) return true;
-        return ~this.options.allowedUsers.indexOf(userId);
+    /**
+     * Checks if user is on the allowedUsers list.
+     *
+     * @param {string} password
+     * @param {int} userId
+     * @returns {boolean}
+     */
+    isUserAuthorized(password, userId) {
+        if (this._options.password !== password) return false;
+        if (this._options.allowedUsers === null) return true;
+        return !!~this._options.allowedUsers.indexOf(userId);
     }
 }
 
 transferRateMonitor = new TransferRateMonitor();
 
-Meteor.publish('transferServer', function(password) {
-    let self = this;
-
-    if (!transferRateMonitor.isAuthorized(password, this.userId)) {
-        console.log('unathorized');
+/**
+ * Publication that will gather session ids that are subscribed to stats from server.
+ */
+Meteor.publish('__serverTransferRate', function transferRate(password) {
+    if (!transferRateMonitor.isUserAuthorized(password, this.userId)) {
         this.stop();
         return;
     }
 
     this.onStop(() => {
-        transferRateMonitor.unregister(self.connection.id);
-        console.log('stop for ' + self.connection.id + ' count: ' + transferRateMonitor.callbacks.length);
+        transferRateMonitor.unregisterConnection(this.connection.id);
     });
 
     try {
-        transferRateMonitor.register(self.connection.id);
-        console.log('registered ' + self.connection.id + ' count: ' + transferRateMonitor.callbacks.length);
+        transferRateMonitor.registerConnection(this.connection.id);
     } catch (exception) {
         this.stop();
     }

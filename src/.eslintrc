@@ -1,7 +1,10 @@
 {
   "extends": "airbnb",
   "globals": {
-    "TransferRateMonitorCommon": true
+    "TransferRateMonitorCommon": true,
+    "TransferRateProtocol": true,
+    "CustomProtocol": true,
+    "DDPCommon": true
   },
   "rules": {
     "indent": [ 2, 4, { "SwitchCase": 1 } ],

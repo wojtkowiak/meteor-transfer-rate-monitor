@@ -1,15 +1,17 @@
 <template name="transferRate">
+    <div>
     {{#if eq for "server"}}
-        {{>monitorWidget firstChartName='Down' widgetName='Server' secondChartName='Up' minScale=1 firstDataSource=(kbs serverTransferIn) secondDataSource=(kbs serverTransferOut)}}
+        {{>monitorWidget class=class graphHistoryCount=60 topMargin=topMargin units="kb/s" firstChartName='Down' widgetName='Server' secondChartName='Up' minScale=1 firstDataSource=(kbs serverTransferIn) secondDataSource=(kbs serverTransferOut)}}
     {{else}}
-        {{>monitorWidget firstChartName='Down' widgetName='Client' secondChartName='Up' minScale=1 firstDataSource=(kbs clientTransferIn) secondDataSource=(kbs clientTransferOut)}}
+        {{>monitorWidget class=class graphHistoryCount=60 topMargin=topMargin units="kb/s" firstChartName='Down' widgetName='Client' secondChartName='Up' minScale=1 firstDataSource=(kbs clientTransferIn) secondDataSource=(kbs clientTransferOut)}}
     {{/if}}
+    </div>
 </template>
 
 <template name="clientTransferRateMonitor">
-    {{>transferRate for="client"}}
+    {{>transferRate for="client" topMargin=topMargin class=class}}
 </template>
 <template name="serverTransferRateMonitor">
-    {{>transferRate for="server"}}
+    {{>transferRate for="server" topMargin=topMargin class=class}}
 </template>
 
