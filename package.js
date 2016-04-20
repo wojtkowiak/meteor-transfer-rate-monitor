@@ -1,6 +1,6 @@
 Package.describe({
     name: 'omega:transfer-rate-monitor',
-    version: '1.0.0',
+    version: '1.0.1',
     summary: 'Provides transfer rate per second for the server and client.',
     git: 'https://github.com/wojtkowiak/meteor-transfer-rate-monitor',
     documentation: 'README.md'
@@ -18,8 +18,8 @@ Package.onUse(function onUse(api) {
         'handlebars'
     ], 'client');
 
-    api.use('omega:direct-stream-access@3.0.0', ['client', 'server']);
-    api.use('omega:custom-protocol@1.0.0', ['client', 'server']);
+    api.use('omega:direct-stream-access@3.0.1', ['client', 'server']);
+    api.use('omega:custom-protocol@1.0.1', ['client', 'server']);
 
     api.addFiles([
         'src/lib/TransferRateMonitor.js',
