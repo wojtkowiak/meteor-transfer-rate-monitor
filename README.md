@@ -67,7 +67,7 @@ The default options object looks like this:
 ```javascript
 {
     maxSubscriptions: 10, // limits the amount of clients receiving server stats globally
-    allowedUsers: null, // here you can pass an array ou userids allowed to subscribe
+    allowedUsers: null, // here you can pass an array of userids allowed to subscribe
     password: 'giveMeStats'
 }
 ```
