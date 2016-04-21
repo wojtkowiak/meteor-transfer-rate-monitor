@@ -12,7 +12,7 @@ TransferRateProtocol = class TransferRateProtocol extends CustomProtocol {
     constructor() {
         super();
         this.SERVER_TRANSFER_RATE_MESSAGE = 1;
-        this.registerProtocol();
+        this.registerProtocol('TransferRateProtocol');
         this.registerMessage(this.SERVER_TRANSFER_RATE_MESSAGE);
 
         if (Meteor.isClient) {
